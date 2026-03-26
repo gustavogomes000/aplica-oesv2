@@ -1,25 +1,20 @@
-import { useState, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Handshake, 
-  ReceiptText, 
-  ClipboardCheck, 
-  UserRoundPlus, 
-  Laptop, 
-  BarChart3, 
-  Globe, 
-  ArrowRight
+import { useState, useCallback, useEffect } from "react";
+import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
+import {
+  Handshake,
+  ReceiptText,
+  ClipboardCheck,
+  UserRoundPlus,
+  Laptop,
+  BarChart3,
+  Globe,
+  ArrowUpRight,
+  Sparkles,
+  Shield,
 } from "lucide-react";
 
 const PHOTO_URL =
   "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/699400706d955b03c8c19827/16e72069d_WhatsAppImage2026-02-17at023641.jpeg";
-
-/* ─── noise SVG inline ───────────────────────────────────────────── */
-const NOISE =
-  "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
-
-/* ─── ícones SVG personalizados (48x48 viewBox) ──────────────────── */
-
 
 /* ─── dados dos apps ─────────────────────────────────────────────── */
 const apps = [
@@ -27,12 +22,10 @@ const apps = [
     id: "liderancas",
     title: "Lideranças",
     desc: "Cadastro de lideranças da campanha",
-    badge: "Cadastros",
-    identity: "Articulação",
-    accent: "#FFD2E4",
+    badge: "Articulação",
     Icon: Handshake,
-    gradient: "linear-gradient(148deg, #FF1F6B 0%, #7A0B2E 100%)",
-    glowColor: "#FF1F6B",
+    gradient: "from-rose-500 to-pink-700",
+    glowColor: "hsl(340, 82%, 52%)",
     url: "https://cadastrodeliderancas.drafernandasarelli.com.br",
   },
   {
@@ -40,11 +33,9 @@ const apps = [
     title: "Financeiro",
     desc: "Lançamento de contas do escritório",
     badge: "Finanças",
-    identity: "Orçamento",
-    accent: "#E9D5FF",
     Icon: ReceiptText,
-    gradient: "linear-gradient(148deg, #A855F7 0%, #4C1D95 100%)",
-    glowColor: "#A855F7",
+    gradient: "from-violet-500 to-purple-800",
+    glowColor: "hsl(270, 76%, 53%)",
     url: "https://financeiro.drafernandasarelli.com.br",
   },
   {
@@ -52,11 +43,9 @@ const apps = [
     title: "Visitas",
     desc: "Registros de visitas ao escritório",
     badge: "Campo",
-    identity: "Território",
-    accent: "#FFE4E6",
     Icon: ClipboardCheck,
-    gradient: "linear-gradient(148deg, #F43F5E 0%, #881337 100%)",
-    glowColor: "#F43F5E",
+    gradient: "from-red-400 to-rose-700",
+    glowColor: "hsl(350, 80%, 55%)",
     url: "https://visitas.drafernandasarelli.com.br",
   },
   {
@@ -64,11 +53,9 @@ const apps = [
     title: "Suplentes",
     desc: "Cadastro de suplentes e apoiadores",
     badge: "Equipe",
-    identity: "Apoio",
-    accent: "#FBCFE8",
     Icon: UserRoundPlus,
-    gradient: "linear-gradient(148deg, #EC4899 0%, #831843 100%)",
-    glowColor: "#EC4899",
+    gradient: "from-pink-400 to-fuchsia-700",
+    glowColor: "hsl(330, 76%, 55%)",
     url: "https://suplentes.drafernandasarelli.com.br",
   },
   {
@@ -76,11 +63,9 @@ const apps = [
     title: "Computadores",
     desc: "Gestão e acesso remoto de TI",
     badge: "TI",
-    identity: "Infraestrutura",
-    accent: "#C7D2FE",
     Icon: Laptop,
-    gradient: "linear-gradient(148deg, #6366F1 0%, #312E81 100%)",
-    glowColor: "#6366F1",
+    gradient: "from-indigo-500 to-blue-800",
+    glowColor: "hsl(230, 76%, 55%)",
     url: "https://computadores.drafernandasarelli.com.br",
   },
   {
@@ -88,154 +73,223 @@ const apps = [
     title: "Dados do Site",
     desc: "Análises e inteligência digital",
     badge: "Analytics",
-    identity: "Inteligência",
-    accent: "#CFFAFE",
     Icon: BarChart3,
-    gradient: "linear-gradient(148deg, #06B6D4 0%, #0C4A6E 100%)",
-    glowColor: "#06B6D4",
+    gradient: "from-cyan-400 to-teal-700",
+    glowColor: "hsl(185, 76%, 50%)",
     url: "https://painel.drafernandasarelli.com.br",
   },
   {
     id: "site",
     title: "Site Oficial",
     desc: "Portal institucional da campanha",
-    badge: "Institucional",
-    identity: "Presença Digital",
-    accent: "#FBCFE8",
+    badge: "Presença",
     Icon: Globe,
-    gradient: "linear-gradient(148deg, #F472B6 0%, #9D174D 100%)",
-    glowColor: "#F472B6",
+    gradient: "from-pink-400 to-rose-600",
+    glowColor: "hsl(340, 82%, 60%)",
     url: "https://www.drafernandasarelli.com.br",
   },
 ] as const;
 
 type App = (typeof apps)[number];
 
-/* ─── aurora blob ────────────────────────────────────────────────── */
-function AuroraBlob({
-  color, size, x, y, delay,
-}: { color: string; size: number; x: string; y: string; delay: number }) {
+/* ─── floating particles ─────────────────────────────────────────── */
+function FloatingParticles() {
   return (
-    <motion.div
-      className="absolute rounded-full pointer-events-none"
-      style={{ width: size, height: size, left: x, top: y, background: color, filter: "blur(110px)", opacity: 0.22 }}
-      animate={{ x: [0, 40, -20, 15, 0], y: [0, -30, 20, -15, 0], scale: [1, 1.1, 0.93, 1.07, 1] }}
-      transition={{ duration: 24 + delay * 4, repeat: Infinity, ease: "easeInOut", delay }}
-    />
-  );
-}
-
-/* ─── card de app — Netflix × Play Store ─────────────────────────── */
-function AppCard({ app, index }: { app: App; index: number }) {
-  const [hovered, setHovered] = useState(false);
-
-  const handleClick = useCallback(() => {
-    window.open(app.url, "_blank", "noopener,noreferrer");
-  }, [app.url]);
-
-  return (
-    <motion.article
-      className="relative overflow-hidden rounded-[18px] cursor-pointer"
-      style={{
-        background: app.gradient,
-        aspectRatio: "1.62 / 1",
-        boxShadow: hovered
-          ? `0 24px 64px ${app.glowColor}55, 0 0 0 1.5px rgba(255,255,255,0.2) inset`
-          : `0 8px 32px ${app.glowColor}28, 0 0 0 1px rgba(255,255,255,0.1) inset`,
-        transition: "box-shadow 0.3s ease",
-      }}
-      initial={{ opacity: 0, y: 36, scale: 0.88 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ type: "spring", stiffness: 380, damping: 24, delay: 0.07 * index }}
-      whileHover={{ y: -8, scale: 1.035 }}
-      onHoverStart={() => setHovered(true)}
-      onHoverEnd={() => setHovered(false)}
-      onClick={handleClick}
-    >
-      {/* noise texture */}
-      <div
-        className="absolute inset-0 opacity-[0.055] pointer-events-none"
-        style={{ backgroundImage: NOISE, backgroundSize: "160px 160px" }}
-      />
-
-      {/* top shine */}
-      <div
-        className="absolute top-0 left-0 right-0 h-1/2 pointer-events-none"
-        style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%)" }}
-      />
-
-      {/* reforço de identidade por módulo */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: `radial-gradient(90% 55% at 85% 10%, ${app.accent}22 0%, transparent 58%)`,
-        }}
-      />
-
-      {/* branding pattern background */}
-      {hovered && (
-        <motion.div 
-          className="absolute inset-0 pointer-events-none opacity-[0.03]"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.05 }}
-          style={{ 
-            backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
-            backgroundSize: '16px 16px'
+    <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+      {Array.from({ length: 20 }).map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute w-1 h-1 rounded-full bg-primary/20"
+          style={{
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+          }}
+          animate={{
+            y: [0, -80 - Math.random() * 120, 0],
+            x: [0, (Math.random() - 0.5) * 60, 0],
+            opacity: [0, 0.6, 0],
+            scale: [0, 1 + Math.random(), 0],
+          }}
+          transition={{
+            duration: 6 + Math.random() * 8,
+            repeat: Infinity,
+            delay: Math.random() * 6,
+            ease: "easeInOut",
           }}
         />
-      )}
-
-      {/* badge categoria — canto superior esquerdo */}
-      <div className="absolute top-3 left-3">
-        <span
-          className="text-[8.5px] font-black uppercase tracking-[0.14em] px-2.5 py-1 rounded-full"
-          style={{
-            background: "rgba(0,0,0,0.4)",
-            backdropFilter: "blur(12px)",
-            color: "rgba(255,255,255,0.9)",
-            border: "1px solid rgba(255,255,255,0.2)",
-          }}
-        >
-          {app.badge}
-        </span>
-      </div>
-
-      {/* ícone — centralizado */}
-      <div className="flex items-center justify-center h-full pt-1.5">
-        <motion.div
-          animate={{ scale: hovered ? 1.08 : 1, y: hovered ? -4 : 0 }}
-          transition={{ type: "spring", stiffness: 420, damping: 22 }}
-          className="rounded-xl p-2"
-          style={{
-            filter: "drop-shadow(0 0 15px rgba(0,0,0,0.2))",
-            color: "white",
-            background: "linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.03))",
-            border: "1px solid rgba(255,255,255,0.16)",
-          }}
-        >
-          <app.Icon size={28} strokeWidth={1.7} />
-        </motion.div>
-      </div>
-
-      {/* info - minimal Netflix style */}
-      <div
-        className="absolute bottom-0 left-0 right-0 px-3.5 pt-7 pb-3"
-        style={{
-          background: "linear-gradient(0deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 50%, transparent 100%)",
-        }}
-      >
-        <div className="flex items-center gap-2">
-          <p className="text-white font-extrabold text-[12.5px] leading-tight tracking-[0.01em]">{app.title}</p>
-          <ArrowRight size={12} className={`text-white/40 transition-transform ${hovered ? 'translate-x-1 opacity-100' : 'opacity-0'}`} />
-        </div>
-        <p className="text-white/78 text-[9.5px] leading-snug mt-1 font-medium line-clamp-2">{app.desc}</p>
-      </div>
-    </motion.article>
+      ))}
+    </div>
   );
 }
 
-/* ─── componente principal ───────────────────────────────────────── */
+/* ─── animated mesh gradient background ─────────────────────────── */
+function MeshBackground() {
+  return (
+    <div className="fixed inset-0 pointer-events-none overflow-hidden">
+      {/* Main gradient orbs */}
+      <motion.div
+        className="absolute -top-[20%] -left-[10%] w-[70vw] h-[70vw] rounded-full opacity-[0.12]"
+        style={{ background: "radial-gradient(circle, hsl(340, 82%, 55%), transparent 70%)" }}
+        animate={{ x: [0, 60, -30, 0], y: [0, -40, 30, 0], scale: [1, 1.15, 0.95, 1] }}
+        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        className="absolute top-[30%] -right-[15%] w-[55vw] h-[55vw] rounded-full opacity-[0.08]"
+        style={{ background: "radial-gradient(circle, hsl(270, 76%, 55%), transparent 70%)" }}
+        animate={{ x: [0, -50, 25, 0], y: [0, 45, -20, 0], scale: [1, 0.9, 1.1, 1] }}
+        transition={{ duration: 25, repeat: Infinity, ease: "easeInOut", delay: 3 }}
+      />
+      <motion.div
+        className="absolute -bottom-[15%] left-[20%] w-[50vw] h-[50vw] rounded-full opacity-[0.06]"
+        style={{ background: "radial-gradient(circle, hsl(200, 76%, 50%), transparent 70%)" }}
+        animate={{ x: [0, 35, -45, 0], y: [0, -25, 40, 0] }}
+        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut", delay: 5 }}
+      />
+      {/* Subtle grain */}
+      <div className="absolute inset-0 opacity-[0.015]" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+        backgroundSize: "180px 180px",
+      }} />
+    </div>
+  );
+}
+
+/* ─── app card ───────────────────────────────────────────────────── */
+function AppCard({ app, index }: { app: App; index: number }) {
+  const [hovered, setHovered] = useState(false);
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const rotateX = useTransform(mouseY, [-0.5, 0.5], [6, -6]);
+  const rotateY = useTransform(mouseX, [-0.5, 0.5], [-6, 6]);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    mouseX.set((e.clientX - rect.left) / rect.width - 0.5);
+    mouseY.set((e.clientY - rect.top) / rect.height - 0.5);
+  }, [mouseX, mouseY]);
+
+  const handleMouseLeave = useCallback(() => {
+    mouseX.set(0);
+    mouseY.set(0);
+    setHovered(false);
+  }, [mouseX, mouseY]);
+
+  return (
+    <motion.a
+      href={app.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group relative block"
+      style={{ perspective: 800 }}
+      initial={{ opacity: 0, y: 50, scale: 0.9 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{
+        type: "spring",
+        stiffness: 260,
+        damping: 20,
+        delay: 0.08 * index + 0.3,
+      }}
+      onMouseMove={handleMouseMove}
+      onHoverStart={() => setHovered(true)}
+      onHoverEnd={handleMouseLeave}
+    >
+      <motion.div
+        className="relative overflow-hidden rounded-2xl border border-white/[0.06] backdrop-blur-sm"
+        style={{
+          rotateX,
+          rotateY,
+          transformStyle: "preserve-3d",
+          background: "linear-gradient(145deg, hsl(240 10% 8% / 0.8), hsl(240 10% 6% / 0.95))",
+        }}
+        whileHover={{ scale: 1.02 }}
+        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+      >
+        {/* Gradient top bar */}
+        <div className={`h-[3px] w-full bg-gradient-to-r ${app.gradient}`} />
+
+        {/* Hover glow effect */}
+        <AnimatePresence>
+          {hovered && (
+            <motion.div
+              className="absolute inset-0 pointer-events-none"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              style={{
+                background: `radial-gradient(300px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), ${app.glowColor}15, transparent 60%)`,
+              }}
+            />
+          )}
+        </AnimatePresence>
+
+        <div className="p-5 sm:p-6">
+          {/* Icon + badge row */}
+          <div className="flex items-start justify-between mb-4">
+            <motion.div
+              className={`flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${app.gradient} shadow-lg`}
+              animate={hovered ? { scale: 1.1, rotate: -5 } : { scale: 1, rotate: 0 }}
+              transition={{ type: "spring", stiffness: 400, damping: 20 }}
+              style={{
+                boxShadow: hovered ? `0 8px 30px ${app.glowColor}40` : `0 4px 15px ${app.glowColor}20`,
+              }}
+            >
+              <app.Icon size={22} strokeWidth={1.8} className="text-white" />
+            </motion.div>
+
+            <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60 bg-white/[0.04] border border-white/[0.06] px-2.5 py-1 rounded-full">
+              {app.badge}
+            </span>
+          </div>
+
+          {/* Title */}
+          <h3 className="text-[15px] font-bold text-foreground/90 mb-1 flex items-center gap-2">
+            {app.title}
+            <motion.span
+              animate={hovered ? { x: 3, y: -3, opacity: 1 } : { x: 0, y: 0, opacity: 0.3 }}
+              transition={{ type: "spring", stiffness: 400, damping: 20 }}
+            >
+              <ArrowUpRight size={14} className="text-primary/60" />
+            </motion.span>
+          </h3>
+
+          {/* Description */}
+          <p className="text-[12px] text-muted-foreground/50 leading-relaxed line-clamp-2">
+            {app.desc}
+          </p>
+        </div>
+
+        {/* Bottom shimmer on hover */}
+        <AnimatePresence>
+          {hovered && (
+            <motion.div
+              className={`absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r ${app.gradient}`}
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              exit={{ scaleX: 0 }}
+              transition={{ duration: 0.4, ease: "easeInOut" }}
+              style={{ transformOrigin: "left" }}
+            />
+          )}
+        </AnimatePresence>
+      </motion.div>
+    </motion.a>
+  );
+}
+
+/* ─── greeting ───────────────────────────────────────────────────── */
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h < 12) return "Bom dia";
+  if (h < 18) return "Boa tarde";
+  return "Boa noite";
+}
+
+/* ─── main component ─────────────────────────────────────────────── */
 export default function Home() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const dateStr = new Date().toLocaleDateString("pt-BR", {
     weekday: "long",
     day: "numeric",
@@ -243,186 +297,180 @@ export default function Home() {
   });
 
   return (
-    <div
-      className="relative min-h-[100dvh] w-full overflow-x-hidden select-none"
-      style={{ background: "hsl(240,12%,5%)" }}
-    >
-      {/* ── aurora de fundo ── */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <AuroraBlob color="#FF1F6B" size={580} x="-12%" y="-14%" delay={0} />
-        <AuroraBlob color="#7C3AED" size={460} x="58%" y="18%" delay={4} />
-        <AuroraBlob color="#9D174D" size={420} x="8%" y="52%" delay={7} />
-        <AuroraBlob color="#4338CA" size={360} x="72%" y="65%" delay={2} />
-        <div
-          className="absolute inset-0 opacity-[0.022]"
-          style={{ backgroundImage: NOISE, backgroundSize: "200px 200px" }}
-        />
-      </div>
+    <div className="relative min-h-[100dvh] w-full overflow-x-hidden select-none dark"
+      style={{ background: "hsl(240, 10%, 5%)" }}>
 
-      {/* ── conteúdo ── */}
+      <MeshBackground />
+      <FloatingParticles />
+
+      {/* Content */}
       <div className="relative z-10 flex flex-col min-h-[100dvh]">
 
-        {/* ── HERO HEADER — Netflix style ── */}
+        {/* Top accent line */}
+        <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
+
+        {/* ── HERO ── */}
         <motion.header
-          className="relative w-full overflow-hidden"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6 }}
+          className="w-full"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         >
-          {/* barra colorida no topo */}
-          <div
-            className="absolute top-0 left-0 right-0 h-[2px]"
-            style={{ background: "linear-gradient(90deg, #FF1F6B, #EC4899, #A855F7, #6366F1, #EC4899)" }}
-          />
+          <div className="max-w-6xl mx-auto px-6 sm:px-10 pt-10 pb-8 sm:pt-14 sm:pb-10">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-8">
 
-          <div className="max-w-6xl mx-auto px-6 sm:px-10 py-8 sm:py-10">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-7">
-
-              {/* foto */}
+              {/* Photo with animated ring */}
               <motion.div
-                className="self-center sm:self-auto relative flex-shrink-0"
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: "spring", stiffness: 320, damping: 24, delay: 0.15 }}
+                className="relative flex-shrink-0"
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: "spring", stiffness: 200, damping: 20, delay: 0.2 }}
               >
-                <div
-                  className="w-[100px] h-[100px] sm:w-[110px] sm:h-[110px] rounded-full p-[4px] relative"
-                  style={{ background: "linear-gradient(135deg, #FF1F6B, #EC4899, #A855F7, #FF1F6B)" }}
-                >
-                  {/* outer glow */}
-                  <div className="absolute inset-0 rounded-full blur-md opacity-40 bg-pink-500 animate-pulse" />
-                  
-                  <div
-                    className="w-full h-full rounded-full overflow-hidden relative z-10"
-                    style={{ background: "hsl(240,12%,5%)" }}
+                {/* Animated gradient ring */}
+                <div className="relative w-28 h-28 sm:w-32 sm:h-32">
+                  <motion.div
+                    className="absolute inset-0 rounded-full"
+                    style={{
+                      background: "conic-gradient(from 0deg, hsl(340,82%,55%), hsl(270,76%,55%), hsl(200,76%,50%), hsl(340,82%,55%))",
+                      padding: "3px",
+                    }}
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
                   >
+                    <div className="w-full h-full rounded-full" style={{ background: "hsl(240,10%,5%)" }} />
+                  </motion.div>
+                  {/* Photo */}
+                  <div className="absolute inset-[5px] rounded-full overflow-hidden">
                     <img
                       src={PHOTO_URL}
                       alt="Dra. Fernanda Sarelli"
-                      className="w-full h-full object-cover grayscale-[20%] hover:grayscale-0 transition-all duration-500"
+                      className="w-full h-full object-cover transition-all duration-700 hover:scale-110"
                       loading="eager"
-                      width={110}
-                      height={110}
                     />
                   </div>
+                  {/* Online indicator */}
+                  <motion.div
+                    className="absolute bottom-1 right-1 w-5 h-5 rounded-full border-[3px] z-20"
+                    style={{
+                      background: "hsl(150, 70%, 50%)",
+                      borderColor: "hsl(240,10%,5%)",
+                      boxShadow: "0 0 12px hsl(150, 70%, 50%, 0.5)",
+                    }}
+                    animate={{ scale: [1, 1.25, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
                 </div>
-                {/* indicador online */}
-                <motion.div
-                  className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-emerald-400 border-[3px] z-20"
-                  style={{ borderColor: "hsl(240,12%,5%) shadow: 0 0 15px rgba(52, 211, 153, 0.5)" }}
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                />
               </motion.div>
 
-              {/* texto */}
+              {/* Text content */}
               <motion.div
-                className="flex flex-col items-center sm:items-start"
-                initial={{ opacity: 0, x: -16 }}
+                className="flex flex-col items-center sm:items-start text-center sm:text-left"
+                initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ type: "spring", stiffness: 300, damping: 26, delay: 0.22 }}
+                transition={{ delay: 0.4, duration: 0.6 }}
               >
-                <h1 className="text-white font-black text-2xl sm:text-3xl lg:text-4xl tracking-tight leading-none">
-                  Dra. Fernanda Sarelli
+                <motion.p
+                  className="text-primary/80 text-xs font-bold uppercase tracking-[0.3em] mb-2 flex items-center gap-2"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.6 }}
+                >
+                  <Sparkles size={12} />
+                  {getGreeting()}
+                </motion.p>
+
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight leading-[1.1]">
+                  <span className="block">Dra. Fernanda</span>
+                  <span className="bg-gradient-to-r from-primary via-pink-400 to-violet-400 bg-clip-text text-transparent">
+                    Sarelli
+                  </span>
                 </h1>
-                <div className="flex items-center gap-2 mt-2">
-                  <span
-                    className="h-[3px] w-6 rounded-full"
-                    style={{ background: "linear-gradient(90deg, #FF1F6B, #EC4899)" }}
-                  />
-                  <p
-                    className="text-xs font-bold uppercase tracking-[0.22em]"
-                    style={{ color: "hsl(340,82%,65%)" }}
-                  >
+
+                <motion.div
+                  className="flex items-center gap-3 mt-3"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.7 }}
+                >
+                  <div className="h-[2px] w-8 rounded-full bg-gradient-to-r from-primary to-transparent" />
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/50">
                     Central de Operações
                   </p>
-                </div>
-                <p className="text-xs text-white/28 capitalize mt-2">{dateStr}</p>
+                </motion.div>
+
+                <motion.p
+                  className="text-xs text-muted-foreground/30 capitalize mt-2"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.8 }}
+                >
+                  {dateStr}
+                </motion.p>
               </motion.div>
 
-              {/* badge acesso — desktop direita */}
+              {/* Status badge — desktop */}
               <motion.div
-                className="hidden sm:flex sm:ml-auto self-center"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4 }}
+                className="hidden sm:flex sm:ml-auto self-start mt-2"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.9, type: "spring" }}
               >
-                <div
-                  className="flex items-center gap-2.5 px-5 py-2.5 rounded-full"
-                  style={{
-                    background: "rgba(255,255,255,0.03)",
-                    backdropFilter: "blur(12px)",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                  }}
-                >
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
-                  <span className="text-[10px] text-white/50 font-black uppercase tracking-[0.2em]">Acesso Restrito</span>
+                <div className="flex items-center gap-2.5 px-4 py-2 rounded-full border border-white/[0.06] backdrop-blur-md"
+                  style={{ background: "hsl(240 10% 8% / 0.6)" }}>
+                  <Shield size={12} className="text-primary/50" />
+                  <span className="text-[10px] text-muted-foreground/40 font-bold uppercase tracking-[0.2em]">
+                    Acesso Restrito
+                  </span>
                 </div>
               </motion.div>
             </div>
           </div>
 
-          {/* separador com fade */}
-          <div
-            className="h-px mx-6 sm:mx-10"
-            style={{
-              background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.07) 30%, rgba(255,255,255,0.07) 70%, transparent)",
-            }}
-          />
+          {/* Divider */}
+          <div className="h-px mx-6 sm:mx-10 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
         </motion.header>
 
-        {/* ── seção de apps ── */}
-        <main className="flex-1 max-w-7xl w-full mx-auto px-5 sm:px-8 py-6 sm:py-8">
+        {/* ── APPS GRID ── */}
+        <main className="flex-1 max-w-6xl w-full mx-auto px-5 sm:px-8 py-8 sm:py-10">
 
-          {/* título da seção */}
+          {/* Section title */}
           <motion.div
-            className="flex items-center gap-3 mb-6 sm:mb-8"
-            initial={{ opacity: 0, x: -12 }}
+            className="flex items-center gap-3 mb-8"
+            initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.32 }}
+            transition={{ delay: 0.5 }}
           >
-            <div
-              className="w-[3px] h-5 rounded-full"
-              style={{ background: "linear-gradient(180deg, #FF1F6B, #A855F7)" }}
-            />
-            <span
-              className="text-[11px] font-black uppercase tracking-[0.3em]"
-              style={{ color: "rgba(255,255,255,0.45)" }}
-            >
+            <div className="w-1 h-6 rounded-full bg-gradient-to-b from-primary to-violet-500" />
+            <span className="text-xs font-black uppercase tracking-[0.25em] text-muted-foreground/40">
               Ecossistema de Gestão
             </span>
-            <div
-              className="flex-1 h-px"
-              style={{ background: "linear-gradient(90deg, rgba(255,255,255,0.08), transparent)" }}
-            />
+            <div className="flex-1 h-px bg-gradient-to-r from-white/[0.06] to-transparent" />
+            <span className="text-[10px] text-muted-foreground/20 font-medium">
+              {apps.length} apps
+            </span>
           </motion.div>
 
-          {/* grid de cards */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-4">
+          {/* Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {apps.map((app, i) => (
               <AppCard key={app.id} app={app} index={i} />
             ))}
           </div>
         </main>
 
-        {/* ── footer ── */}
+        {/* ── FOOTER ── */}
         <motion.footer
           className="max-w-6xl w-full mx-auto px-6 sm:px-10 pb-8 pt-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.0 }}
+          transition={{ delay: 1.2 }}
         >
-          <div
-            className="h-px mb-5"
-            style={{
-              background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.06) 30%, rgba(255,255,255,0.06) 70%, transparent)",
-            }}
-          />
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-1.5">
-            <p className="text-[11px]" style={{ color: "rgba(255,31,107,0.38)" }}>
+          <div className="h-px mb-6 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
+            <p className="text-[11px] text-primary/25 font-medium">
               Pré-candidata a Deputada Estadual — GO 2026
             </p>
-            <p className="text-[11px]" style={{ color: "rgba(255,255,255,0.14)" }}>
+            <p className="text-[11px] text-muted-foreground/15">
               © {new Date().getFullYear()} Dra. Fernanda Sarelli
             </p>
           </div>
