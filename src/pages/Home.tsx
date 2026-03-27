@@ -323,8 +323,8 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         >
-          <div className="max-w-6xl mx-auto px-6 sm:px-10 pt-10 pb-8 sm:pt-14 sm:pb-10">
-            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-8">
+          <div className="max-w-5xl mx-auto px-4 sm:px-8 pt-8 pb-6 sm:pt-12 sm:pb-8">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-6">
 
               {/* Photo with animated ring */}
               <motion.div
