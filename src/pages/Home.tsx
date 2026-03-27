@@ -77,7 +77,7 @@ const apps = [
     Icon: BarChart3,
     gradient: "from-cyan-400 to-teal-700",
     glowColor: "hsl(185, 76%, 50%)",
-    url: "https://paineldedados.deputadasarelli.com.br/login",
+    url: "http://paineldedados.deputadasarelli.com.br/login",
   },
   {
     id: "site",
