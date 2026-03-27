@@ -40,7 +40,7 @@ const apps = [
     Icon: ReceiptText,
     gradient: "from-violet-500 to-purple-800",
     glowColor: "hsl(270, 76%, 53%)",
-    url: "https://contas.deputadasarelli.com.br/login",
+    url: "https://contas.deputadasarelli.com.br",
     xp: 720,
   },
   {
