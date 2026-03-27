@@ -12,10 +12,6 @@ import {
   Sparkles,
   Shield,
   Zap,
-  Activity,
-  Wifi,
-  Database,
-  Cpu,
 } from "lucide-react";
 
 const PHOTO_URL =
