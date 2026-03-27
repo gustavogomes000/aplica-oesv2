@@ -96,13 +96,13 @@ type App = (typeof apps)[number];
 function TechBackground() {
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-      {/* Base gradient */}
+      {/* Base gradient - deeper dark */}
       <div className="absolute inset-0" style={{
-        background: "radial-gradient(ellipse 80% 60% at 50% 40%, hsl(240, 20%, 10%) 0%, hsl(240, 15%, 4%) 100%)",
+        background: "radial-gradient(ellipse 80% 60% at 50% 40%, hsl(240, 25%, 8%) 0%, hsl(240, 20%, 3%) 100%)",
       }} />
 
-      {/* Grid overlay */}
-      <div className="absolute inset-0 opacity-[0.07]" style={{
+      {/* Primary grid */}
+      <div className="absolute inset-0 opacity-[0.06]" style={{
         backgroundImage: `
           linear-gradient(hsl(200, 80%, 50%) 1px, transparent 1px),
           linear-gradient(90deg, hsl(200, 80%, 50%) 1px, transparent 1px)
@@ -110,64 +110,125 @@ function TechBackground() {
         backgroundSize: "60px 60px",
       }} />
 
-      {/* Smaller sub-grid */}
+      {/* Hex sub-grid pattern */}
       <div className="absolute inset-0 opacity-[0.03]" style={{
         backgroundImage: `
-          linear-gradient(hsl(200, 80%, 50%) 1px, transparent 1px),
-          linear-gradient(90deg, hsl(200, 80%, 50%) 1px, transparent 1px)
+          linear-gradient(60deg, hsl(340, 82%, 55%) 1px, transparent 1px),
+          linear-gradient(-60deg, hsl(340, 82%, 55%) 1px, transparent 1px)
         `,
-        backgroundSize: "15px 15px",
+        backgroundSize: "40px 70px",
       }} />
 
-      {/* Horizontal scan line */}
+      {/* Dual scan lines */}
       <div className="absolute inset-0 overflow-hidden">
-        <div
-          className="absolute left-0 right-0 h-[2px] opacity-[0.08]"
+        <div className="absolute left-0 right-0 h-[2px] opacity-[0.12]"
           style={{
             background: "linear-gradient(90deg, transparent, hsl(340, 82%, 55%), hsl(200, 80%, 50%), transparent)",
-            animation: "scanLine 6s linear infinite",
+            animation: "scanLine 5s linear infinite",
+          }}
+        />
+        <div className="absolute left-0 right-0 h-px opacity-[0.06]"
+          style={{
+            background: "linear-gradient(90deg, transparent, hsl(200, 80%, 50%), transparent)",
+            animation: "scanLine 8s linear infinite 2s",
           }}
         />
       </div>
 
-      {/* Corner brackets - top left */}
-      <div className="absolute top-6 left-6 w-16 h-16 border-l-2 border-t-2 border-primary/20 rounded-tl-sm" />
-      <div className="absolute top-6 right-6 w-16 h-16 border-r-2 border-t-2 border-primary/20 rounded-tr-sm" />
-      <div className="absolute bottom-6 left-6 w-16 h-16 border-l-2 border-b-2 border-primary/20 rounded-bl-sm" />
-      <div className="absolute bottom-6 right-6 w-16 h-16 border-r-2 border-b-2 border-primary/20 rounded-br-sm" />
+      {/* Vertical scan */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-0 bottom-0 w-[2px] opacity-[0.06]"
+          style={{
+            background: "linear-gradient(to bottom, transparent, hsl(340, 82%, 55%), transparent)",
+            animation: "scanLineH 7s linear infinite",
+          }}
+        />
+      </div>
 
-      {/* Radial glow behind content */}
-      <div className="absolute top-[15%] left-1/2 -translate-x-1/2 w-[800px] h-[600px] rounded-full opacity-[0.06]"
-        style={{ background: "radial-gradient(circle, hsl(340, 82%, 55%), transparent 70%)" }}
+      {/* Corner brackets */}
+      <div className="absolute top-4 left-4 w-12 h-12 border-l-2 border-t-2 border-primary/20 rounded-tl-sm" />
+      <div className="absolute top-4 right-4 w-12 h-12 border-r-2 border-t-2 border-primary/20 rounded-tr-sm" />
+      <div className="absolute bottom-4 left-4 w-12 h-12 border-l-2 border-b-2 border-primary/20 rounded-bl-sm" />
+      <div className="absolute bottom-4 right-4 w-12 h-12 border-r-2 border-b-2 border-primary/20 rounded-br-sm" />
+
+      {/* Radar sweep */}
+      <div className="absolute top-[18%] right-[6%] w-32 h-32 hidden lg:block">
+        <div className="absolute inset-0 rounded-full border border-cyan-500/[0.08]" />
+        <div className="absolute inset-3 rounded-full border border-cyan-500/[0.05]" />
+        <div className="absolute inset-6 rounded-full border border-cyan-500/[0.03]" />
+        <div className="absolute inset-0 rounded-full overflow-hidden"
+          style={{ animation: "radarSweep 4s linear infinite" }}>
+          <div className="absolute top-1/2 left-1/2 w-1/2 h-[2px] origin-left"
+            style={{ background: "linear-gradient(90deg, hsl(200, 80%, 50%), transparent)" }} />
+        </div>
+        {/* Radar blips */}
+        <div className="absolute top-[30%] left-[60%] w-1.5 h-1.5 rounded-full bg-primary/40"
+          style={{ animation: "blip 3s ease-in-out infinite" }} />
+        <div className="absolute top-[55%] left-[35%] w-1 h-1 rounded-full bg-cyan-400/30"
+          style={{ animation: "blip 3s ease-in-out infinite 1.5s" }} />
+      </div>
+
+      {/* Circuit lines */}
+      <svg className="absolute bottom-[10%] left-[5%] w-48 h-32 opacity-[0.06] hidden md:block" viewBox="0 0 200 120">
+        <path d="M0,60 H40 L50,30 H90 L100,60 H140 L150,90 H200" fill="none" stroke="hsl(200,80%,50%)" strokeWidth="1.5"
+          strokeDasharray="8 4" style={{ animation: "circuitFlow 3s linear infinite" }} />
+        <path d="M0,90 H30 L40,60 H80 L90,90 H130 L140,30 H200" fill="none" stroke="hsl(340,82%,55%)" strokeWidth="1"
+          strokeDasharray="6 6" style={{ animation: "circuitFlow 4s linear infinite reverse" }} />
+        <circle cx="50" cy="30" r="3" fill="hsl(200,80%,50%)" style={{ animation: "blip 2s ease-in-out infinite" }} />
+        <circle cx="140" cy="30" r="2" fill="hsl(340,82%,55%)" style={{ animation: "blip 2s ease-in-out infinite 1s" }} />
+      </svg>
+
+      {/* Circuit lines - right side */}
+      <svg className="absolute top-[40%] right-[3%] w-32 h-48 opacity-[0.05] hidden lg:block" viewBox="0 0 120 200">
+        <path d="M60,0 V40 L90,50 V90 L30,100 V140 L60,150 V200" fill="none" stroke="hsl(200,80%,50%)" strokeWidth="1"
+          strokeDasharray="6 4" style={{ animation: "circuitFlow 5s linear infinite" }} />
+        <circle cx="90" cy="50" r="2.5" fill="hsl(200,80%,50%)" style={{ animation: "blip 3s ease-in-out infinite 0.5s" }} />
+      </svg>
+
+      {/* Data stream dots */}
+      {[8, 25, 42, 58, 75, 92].map((left, i) => (
+        <div key={i} className="absolute top-0 w-px h-full"
+          style={{
+            left: `${left}%`,
+            opacity: 0.02 + (i % 3) * 0.015,
+            background: `repeating-linear-gradient(to bottom, transparent, transparent ${18 + i * 4}px, ${i % 2 === 0 ? 'hsl(200,80%,50%)' : 'hsl(340,82%,55%)'} ${18 + i * 4}px, ${i % 2 === 0 ? 'hsl(200,80%,50%)' : 'hsl(340,82%,55%)'} ${20 + i * 4}px)`,
+            animation: `dataStream ${3 + i * 0.8}s linear infinite ${i % 2 === 0 ? '' : 'reverse'}`,
+          }}
+        />
+      ))}
+
+      {/* Radial glows */}
+      <div className="absolute top-[15%] left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full opacity-[0.07]"
+        style={{ background: "radial-gradient(circle, hsl(340, 82%, 55%), transparent 65%)" }}
       />
-      <div className="absolute top-[50%] left-[20%] w-[400px] h-[400px] rounded-full opacity-[0.04]"
+      <div className="absolute top-[55%] left-[15%] w-[350px] h-[350px] rounded-full opacity-[0.04]"
         style={{ background: "radial-gradient(circle, hsl(200, 80%, 50%), transparent 70%)" }}
       />
-
-      {/* Data stream dots - vertical */}
-      <div className="absolute top-0 left-[10%] w-px h-full opacity-[0.06]"
-        style={{
-          background: "repeating-linear-gradient(to bottom, transparent, transparent 20px, hsl(200, 80%, 50%) 20px, hsl(200, 80%, 50%) 22px)",
-          animation: "dataStream 4s linear infinite",
-        }}
-      />
-      <div className="absolute top-0 right-[15%] w-px h-full opacity-[0.04]"
-        style={{
-          background: "repeating-linear-gradient(to bottom, transparent, transparent 30px, hsl(340, 82%, 55%) 30px, hsl(340, 82%, 55%) 32px)",
-          animation: "dataStream 6s linear infinite reverse",
-        }}
+      <div className="absolute top-[30%] right-[10%] w-[250px] h-[250px] rounded-full opacity-[0.03]"
+        style={{ background: "radial-gradient(circle, hsl(270, 76%, 53%), transparent 70%)" }}
       />
 
       {/* HUD circles */}
-      <div className="absolute top-[20%] right-[8%] w-24 h-24 rounded-full border border-primary/[0.06] hidden lg:block"
-        style={{ animation: "hudPulse 4s ease-in-out infinite" }}
-      />
-      <div className="absolute top-[22%] right-[8%] w-20 h-20 rounded-full border border-cyan-500/[0.04] ml-2 mt-2 hidden lg:block"
-        style={{ animation: "hudPulse 4s ease-in-out infinite 1s" }}
-      />
+      <div className="absolute bottom-[15%] left-[8%] w-20 h-20 rounded-full border border-primary/[0.08] hidden lg:block"
+        style={{ animation: "hudPulse 4s ease-in-out infinite" }}>
+        <div className="absolute inset-2 rounded-full border border-primary/[0.05]"
+          style={{ animation: "hudPulse 4s ease-in-out infinite 0.5s" }} />
+      </div>
+
+      {/* Floating status indicators */}
+      <div className="absolute top-[12%] left-[12%] hidden lg:flex items-center gap-1.5 opacity-[0.15]"
+        style={{ animation: "hudPulse 5s ease-in-out infinite 2s" }}>
+        <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+        <span className="text-[9px] font-mono text-emerald-400/80 tracking-widest">SYS.ONLINE</span>
+      </div>
+      <div className="absolute bottom-[20%] right-[12%] hidden lg:flex items-center gap-1.5 opacity-[0.12]"
+        style={{ animation: "hudPulse 5s ease-in-out infinite 3s" }}>
+        <div className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+        <span className="text-[9px] font-mono text-cyan-400/80 tracking-widest">NET.SECURE</span>
+      </div>
 
       {/* Noise texture */}
-      <div className="absolute inset-0 opacity-[0.02]" style={{
+      <div className="absolute inset-0 opacity-[0.025]" style={{
         backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
         backgroundSize: "128px 128px",
       }} />

@@ -130,6 +130,11 @@
   100% { top: 100%; }
 }
 
+@keyframes scanLineH {
+  0% { left: -2px; }
+  100% { left: 100%; }
+}
+
 @keyframes dataStream {
   0% { transform: translateY(0); }
   100% { transform: translateY(60px); }
@@ -138,4 +143,19 @@
 @keyframes hudPulse {
   0%, 100% { opacity: 0.06; transform: scale(1); }
   50% { opacity: 0.12; transform: scale(1.05); }
+}
+
+@keyframes radarSweep {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes blip {
+  0%, 100% { opacity: 0.1; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.3); }
+}
+
+@keyframes circuitFlow {
+  0% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: 24; }
 }
