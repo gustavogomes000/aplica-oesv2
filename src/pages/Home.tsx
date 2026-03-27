@@ -86,7 +86,7 @@ const apps = [
     Icon: Globe,
     gradient: "from-pink-400 to-rose-600",
     glowColor: "hsl(340, 82%, 60%)",
-    url: "https://www.drafernandasarelli.com.br",
+    url: "https://www.deputadasarelli.com.br",
   },
 ] as const;
 
