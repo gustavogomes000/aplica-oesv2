@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { toast } from "@/hooks/use-toast";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import {
   Handshake,
