@@ -42,7 +42,7 @@ const apps = [
     id: "visitas",
     title: "Visitas",
     desc: "Registros de visitas ao escritório",
-    badge: "Campo",
+    badge: "Escritório",
     Icon: ClipboardCheck,
     gradient: "from-red-400 to-rose-700",
     glowColor: "hsl(350, 80%, 55%)",
