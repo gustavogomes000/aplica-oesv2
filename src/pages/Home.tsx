@@ -336,17 +336,22 @@ function AppCard({ app, index }: { app: App; index: number }) {
   const maxXp = 1000;
   const xpPercent = (app.xp / maxXp) * 100;
 
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    window.open(app.url, '_blank', 'noopener,noreferrer');
+  };
+
   return (
     <motion.a
       href={app.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="group relative block"
+      onClick={handleClick}
+      className="group relative block cursor-pointer"
       initial={{ opacity: 0, y: 24, scale: 0.9 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.4, delay: 0.05 * index + 0.15, type: "spring", stiffness: 180, damping: 18 }}
       whileHover={{ y: -4 }}
-      whileTap={{ scale: 0.97 }}
     >
       <div className="relative overflow-hidden rounded-xl border border-white/[0.06] transition-all duration-300 group-hover:border-primary/25 group-hover:shadow-[0_0_30px_-10px] group-hover:shadow-primary/20"
         style={{ background: "linear-gradient(145deg, hsl(240 10% 9% / 0.9), hsl(240 10% 5% / 0.95))" }}>
