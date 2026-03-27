@@ -238,65 +238,48 @@ function TechBackground() {
 
 /* ─── app card ───────────────────────────────────────────────────── */
 function AppCard({ app, index }: { app: App; index: number }) {
-  const [hovered, setHovered] = useState(false);
-  const handleMouseLeave = useCallback(() => setHovered(false), []);
-
   return (
     <motion.a
       href={app.url}
       target="_blank"
       rel="noopener noreferrer"
       className="group relative block"
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.05 * index + 0.2 }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={handleMouseLeave}
+      transition={{ duration: 0.35, delay: 0.04 * index + 0.2 }}
     >
       <div
-        className="relative overflow-hidden rounded-2xl border border-white/[0.06] transition-transform duration-200 hover:scale-[1.02]"
-        style={{ background: "linear-gradient(145deg, hsl(240 10% 8% / 0.8), hsl(240 10% 6% / 0.95))" }}
+        className="relative overflow-hidden rounded-xl border border-white/[0.06] transition-all duration-200 hover:scale-[1.02] hover:border-white/[0.12]"
+        style={{ background: "linear-gradient(145deg, hsl(240 10% 9% / 0.9), hsl(240 10% 6% / 0.95))" }}
       >
         {/* Gradient top bar */}
-        <div className={`h-[3px] w-full bg-gradient-to-r ${app.gradient}`} />
+        <div className={`h-[2px] w-full bg-gradient-to-r ${app.gradient}`} />
 
-        {/* Hover glow effect */}
-        <div
-          className={`absolute inset-0 pointer-events-none transition-opacity duration-300 ${hovered ? "opacity-100" : "opacity-0"}`}
-          style={{ background: `radial-gradient(300px circle at 50% 50%, ${app.glowColor}15, transparent 60%)` }}
-        />
-
-        <div className="p-5 sm:p-6">
+        <div className="p-4">
           {/* Icon + badge row */}
-          <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center justify-between mb-3">
             <div
-              className={`flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${app.gradient} shadow-lg transition-transform duration-200 ${hovered ? "scale-110 -rotate-3" : ""}`}
-              style={{ boxShadow: `0 4px 15px ${app.glowColor}20` }}
+              className={`flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br ${app.gradient} shadow-lg group-hover:scale-110 transition-transform duration-200`}
             >
-              <app.Icon size={22} strokeWidth={1.8} className="text-white" />
+              <app.Icon size={18} strokeWidth={1.8} className="text-white" />
             </div>
 
-            <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60 bg-white/[0.04] border border-white/[0.06] px-2.5 py-1 rounded-full">
+            <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-muted-foreground/50 bg-white/[0.04] border border-white/[0.06] px-2 py-0.5 rounded-full">
               {app.badge}
             </span>
           </div>
 
           {/* Title */}
-          <h3 className="text-[15px] font-bold text-foreground/90 mb-1 flex items-center gap-2">
+          <h3 className="text-sm font-bold text-foreground/90 mb-0.5 flex items-center gap-1.5">
             {app.title}
-            <ArrowUpRight size={14} className={`text-primary/60 transition-all duration-200 ${hovered ? "translate-x-0.5 -translate-y-0.5 opacity-100" : "opacity-30"}`} />
+            <ArrowUpRight size={12} className="text-primary/40 group-hover:text-primary/80 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-200" />
           </h3>
 
           {/* Description */}
-          <p className="text-[12px] text-muted-foreground/50 leading-relaxed line-clamp-2">
+          <p className="text-[11px] text-muted-foreground/40 leading-relaxed line-clamp-1">
             {app.desc}
           </p>
         </div>
-
-        {/* Bottom shimmer on hover */}
-        <div
-          className={`absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r ${app.gradient} transition-transform duration-300 origin-left ${hovered ? "scale-x-100" : "scale-x-0"}`}
-        />
       </div>
     </motion.a>
   );
@@ -340,8 +323,8 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         >
-          <div className="max-w-6xl mx-auto px-6 sm:px-10 pt-10 pb-8 sm:pt-14 sm:pb-10">
-            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-8">
+          <div className="max-w-5xl mx-auto px-4 sm:px-8 pt-8 pb-6 sm:pt-12 sm:pb-8">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-6">
 
               {/* Photo with animated ring */}
               <motion.div
@@ -351,7 +334,7 @@ export default function Home() {
                 transition={{ type: "spring", stiffness: 200, damping: 20, delay: 0.2 }}
               >
                 {/* Animated gradient ring */}
-                <div className="relative w-28 h-28 sm:w-32 sm:h-32">
+                <div className="relative w-24 h-24 sm:w-28 sm:h-28">
                   <motion.div
                     className="absolute inset-0 rounded-full"
                     style={{
@@ -403,7 +386,7 @@ export default function Home() {
                   {getGreeting()}
                 </motion.p>
 
-                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight leading-[1.1]">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-foreground tracking-tight leading-[1.1]">
                   <span className="block">Dra. Fernanda</span>
                   <span className="bg-gradient-to-r from-primary via-pink-400 to-violet-400 bg-clip-text text-transparent">
                     Sarelli
@@ -455,17 +438,17 @@ export default function Home() {
         </motion.header>
 
         {/* ── APPS GRID ── */}
-        <main className="flex-1 max-w-6xl w-full mx-auto px-5 sm:px-8 py-8 sm:py-10">
+        <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-8 py-6 sm:py-8">
 
           {/* Section title */}
           <motion.div
-            className="flex items-center gap-3 mb-8"
+            className="flex items-center gap-2 mb-6"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.5 }}
           >
-            <div className="w-1 h-6 rounded-full bg-gradient-to-b from-primary to-violet-500" />
-            <span className="text-xs font-black uppercase tracking-[0.25em] text-muted-foreground/40">
+            <div className="w-1 h-5 rounded-full bg-gradient-to-b from-primary to-violet-500" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40">
               Ecossistema de Gestão
             </span>
             <div className="flex-1 h-px bg-gradient-to-r from-white/[0.06] to-transparent" />
@@ -474,8 +457,8 @@ export default function Home() {
             </span>
           </motion.div>
 
-          {/* Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {/* Grid - 2 cols mobile, 3 tablet, 4 desktop */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
             {apps.map((app, i) => (
               <AppCard key={app.id} app={app} index={i} />
             ))}
@@ -484,7 +467,7 @@ export default function Home() {
 
         {/* ── FOOTER ── */}
         <motion.footer
-          className="max-w-6xl w-full mx-auto px-6 sm:px-10 pb-8 pt-4"
+          className="max-w-5xl w-full mx-auto px-4 sm:px-8 pb-6 pt-2"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.2 }}
