@@ -201,12 +201,7 @@ function AppCard({ app, index }: { app: App; index: number }) {
           {/* Title */}
           <h3 className="text-[15px] font-bold text-foreground/90 mb-1 flex items-center gap-2">
             {app.title}
-            <motion.span
-              animate={hovered ? { x: 3, y: -3, opacity: 1 } : { x: 0, y: 0, opacity: 0.3 }}
-              transition={{ type: "spring", stiffness: 400, damping: 20 }}
-            >
-              <ArrowUpRight size={14} className="text-primary/60" />
-            </motion.span>
+            <ArrowUpRight size={14} className={`text-primary/60 transition-all duration-200 ${hovered ? "translate-x-0.5 -translate-y-0.5 opacity-100" : "opacity-30"}`} />
           </h3>
 
           {/* Description */}
