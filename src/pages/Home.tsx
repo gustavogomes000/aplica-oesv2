@@ -92,30 +92,27 @@ const apps = [
 
 type App = (typeof apps)[number];
 
-/* ─── floating particles ─────────────────────────────────────────── */
+/* ─── floating particles (reduced to 8 for performance) ──────────── */
+const PARTICLES = Array.from({ length: 8 }, (_, i) => ({
+  id: i,
+  left: `${(i * 12.5) % 100}%`,
+  top: `${(i * 15) % 100}%`,
+  yEnd: -80 - (i % 3) * 40,
+  xEnd: ((i % 2 === 0 ? 1 : -1) * 20),
+  dur: 8 + (i % 3) * 4,
+  del: i * 0.8,
+}));
+
 function FloatingParticles() {
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-      {Array.from({ length: 20 }).map((_, i) => (
+      {PARTICLES.map((p) => (
         <motion.div
-          key={i}
+          key={p.id}
           className="absolute w-1 h-1 rounded-full bg-primary/20"
-          style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-          }}
-          animate={{
-            y: [0, -80 - Math.random() * 120, 0],
-            x: [0, (Math.random() - 0.5) * 60, 0],
-            opacity: [0, 0.6, 0],
-            scale: [0, 1 + Math.random(), 0],
-          }}
-          transition={{
-            duration: 6 + Math.random() * 8,
-            repeat: Infinity,
-            delay: Math.random() * 6,
-            ease: "easeInOut",
-          }}
+          style={{ left: p.left, top: p.top }}
+          animate={{ y: [0, p.yEnd, 0], x: [0, p.xEnd, 0], opacity: [0, 0.6, 0] }}
+          transition={{ duration: p.dur, repeat: Infinity, delay: p.del, ease: "easeInOut" }}
         />
       ))}
     </div>
