@@ -234,19 +234,6 @@ export default function Home() {
                       loading="eager"
                     />
                   </div>
-                  {/* Level badge */}
-                  <motion.div
-                    className="absolute -bottom-1 -right-1 sm:-bottom-1.5 sm:-right-1.5 z-20 flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 sm:border-[3px]"
-                    style={{
-                      background: "linear-gradient(135deg, hsl(340,82%,55%), hsl(270,76%,55%))",
-                      borderColor: "hsl(240,10%,3%)",
-                      boxShadow: "0 0 12px hsl(340,82%,55%,0.4)",
-                    }}
-                    animate={{ scale: [1, 1.1, 1] }}
-                    transition={{ duration: 3, repeat: Infinity }}
-                  >
-                    <span className="text-[8px] sm:text-[10px] font-black text-white">99</span>
-                  </motion.div>
                 </div>
               </motion.div>
 
