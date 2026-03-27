@@ -62,7 +62,7 @@ const apps = [
     Icon: UserRoundPlus,
     gradient: "from-pink-400 to-fuchsia-700",
     glowColor: "hsl(330, 76%, 55%)",
-    url: "https://suplentes.deputadasarelli.com.br/login",
+    url: "https://suplentes.deputadasarelli.com.br",
     xp: 580,
   },
   {
