@@ -17,20 +17,24 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
+      devOptions: {
+        enabled: false,
+      },
       includeAssets: ["icon-192.png", "icon-512.png"],
       workbox: {
         navigateFallbackDenylist: [/^\/~oauth/],
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
       },
       manifest: {
-        name: "Painel Admin - Dra. Fernanda Sarelli",
-        short_name: "Painel Admin",
-        description: "Central de Operações",
+        name: "Central de Operações - Dra. Fernanda Sarelli",
+        short_name: "Central Ops",
+        description: "Central de Operações e Gestão",
         start_url: "/",
         display: "standalone",
         orientation: "portrait",
         theme_color: "#ec4899",
         background_color: "#070510",
+        categories: ["productivity", "utilities"],
         icons: [
           { src: "/icon-192.png", sizes: "192x192", type: "image/png" },
           { src: "/icon-512.png", sizes: "512x512", type: "image/png" },
