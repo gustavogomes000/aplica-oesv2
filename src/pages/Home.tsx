@@ -14,6 +14,7 @@ import {
   Sparkles,
   Shield,
   Zap,
+  Building2,
 } from "lucide-react";
 
 const PHOTO_URL =
