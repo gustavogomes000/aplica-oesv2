@@ -14,6 +14,7 @@ import {
   Sparkles,
   Shield,
   Zap,
+  Building2,
 } from "lucide-react";
 
 const PHOTO_URL =
@@ -86,6 +87,17 @@ const apps = [
     glowColor: "hsl(185, 76%, 50%)",
     url: "https://paineldedados.deputadasarelli.com.br/",
     xp: 920,
+  },
+  {
+    id: "sindspag",
+    title: "SINDSPAG",
+    desc: "Gestão sindical e associados",
+    badge: "Sindicato",
+    Icon: Building2,
+    gradient: "from-amber-500 to-orange-700",
+    glowColor: "hsl(30, 80%, 50%)",
+    url: "https://sindspag.deputadasarelli.com.br/",
+    xp: 760,
   },
   {
     id: "site",
