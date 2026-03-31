@@ -91,14 +91,14 @@ export default function NeuralNetworkBg() {
       for (const n of nodes) {
         n.pulse += n.pulseSpeed;
 
-        // Very gentle sinusoidal drift
-        const driftX = Math.sin(t * 0.8 + n.pulse * 3) * 25;
-        const driftY = Math.cos(t * 0.6 + n.pulse * 2.5) * 25;
+        // Very slow breathing drift
+        const driftX = Math.sin(t * 0.4 + n.pulse * 2) * 12;
+        const driftY = Math.cos(t * 0.3 + n.pulse * 1.5) * 12;
         const targetX = n.originX + driftX;
         const targetY = n.originY + driftY;
 
-        n.vx += (targetX - n.x) * 0.002;
-        n.vy += (targetY - n.y) * 0.002;
+        n.vx += (targetX - n.x) * 0.001;
+        n.vy += (targetY - n.y) * 0.001;
 
         // Mouse gentle repulsion
         const dx = n.x - mouse.x;
