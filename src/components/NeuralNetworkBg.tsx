@@ -3,51 +3,28 @@ import { useEffect, useRef, useCallback } from "react";
 interface Node {
   x: number;
   y: number;
-  targetX: number;
-  targetY: number;
+  originX: number;
+  originY: number;
+  vx: number;
+  vy: number;
   radius: number;
-  type: "hub" | "relay" | "data";
   pulse: number;
   pulseSpeed: number;
-  active: boolean;
-  activeCooldown: number;
-  ring: number;
+  layer: number;
 }
 
-interface DataPacket {
-  fromIdx: number;
-  toIdx: number;
-  progress: number;
-  speed: number;
-  color: string;
-}
+const PINK = "340,82%,55%";
+const CYAN = "190,85%,50%";
+const PURPLE = "270,70%,55%";
 
-interface ScanBeam {
-  angle: number;
-  speed: number;
-  length: number;
-  opacity: number;
-}
-
-const PINK = { h: 340, s: 82, l: 55 };
-const CYAN = { h: 190, s: 85, l: 50 };
-const PURPLE = { h: 270, s: 70, l: 55 };
-const BLUE = { h: 220, s: 75, l: 50 };
-
-function hsl(c: { h: number; s: number; l: number }, a = 1) {
-  return `hsla(${c.h},${c.s}%,${c.l}%,${a})`;
-}
-
-const NODE_COUNT_DESKTOP = 60;
-const NODE_COUNT_MOBILE = 35;
-const MAX_CONN = 200;
-const CONN_DIST = 220;
+const COLORS = [PINK, CYAN, PURPLE];
+const NODE_COUNT_DESKTOP = 80;
+const NODE_COUNT_MOBILE = 45;
+const CONN_DIST = 200;
 
 export default function NeuralNetworkBg() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const nodesRef = useRef<Node[]>([]);
-  const packetsRef = useRef<DataPacket[]>([]);
-  const beamsRef = useRef<ScanBeam[]>([]);
   const mouseRef = useRef({ x: -1000, y: -1000 });
   const animRef = useRef(0);
   const timeRef = useRef(0);
@@ -56,45 +33,22 @@ export default function NeuralNetworkBg() {
     const count = w < 640 ? NODE_COUNT_MOBILE : NODE_COUNT_DESKTOP;
     const nodes: Node[] = [];
 
-    // Create structured grid with noise
-    const cols = Math.ceil(Math.sqrt(count * (w / h)));
-    const rows = Math.ceil(count / cols);
-    const cellW = w / cols;
-    const cellH = h / rows;
-
     for (let i = 0; i < count; i++) {
-      const col = i % cols;
-      const row = Math.floor(i / cols);
-      const baseX = col * cellW + cellW / 2;
-      const baseY = row * cellH + cellH / 2;
-      // Add controlled randomness
-      const jitterX = (Math.random() - 0.5) * cellW * 0.7;
-      const jitterY = (Math.random() - 0.5) * cellH * 0.7;
-      const x = baseX + jitterX;
-      const y = baseY + jitterY;
-
-      const type = Math.random() < 0.12 ? "hub" : Math.random() < 0.4 ? "relay" : "data";
-
+      const x = Math.random() * w;
+      const y = Math.random() * h;
       nodes.push({
         x, y,
-        targetX: x,
-        targetY: y,
-        radius: type === "hub" ? 3 : type === "relay" ? 2 : 1.2,
-        type,
+        originX: x,
+        originY: y,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        radius: 1.2 + Math.random() * 2,
         pulse: Math.random() * Math.PI * 2,
-        pulseSpeed: 0.02 + Math.random() * 0.03,
-        active: false,
-        activeCooldown: Math.random() * 200,
-        ring: 0,
+        pulseSpeed: 0.015 + Math.random() * 0.02,
+        layer: Math.floor(Math.random() * 3),
       });
     }
     nodesRef.current = nodes;
-
-    // Init scan beams
-    beamsRef.current = [
-      { angle: 0, speed: 0.003, length: Math.max(w, h) * 0.8, opacity: 0.04 },
-      { angle: Math.PI * 0.7, speed: -0.002, length: Math.max(w, h) * 0.6, opacity: 0.03 },
-    ];
   }, []);
 
   useEffect(() => {
@@ -127,262 +81,131 @@ export default function NeuralNetworkBg() {
       const w = window.innerWidth;
       const h = window.innerHeight;
       const nodes = nodesRef.current;
-      const packets = packetsRef.current;
-      const beams = beamsRef.current;
       const mouse = mouseRef.current;
       const t = timeRef.current;
       timeRef.current += 0.016;
 
       ctx.clearRect(0, 0, w, h);
 
-      // ── Subtle hex grid ──
-      ctx.strokeStyle = hsl(CYAN, 0.025);
-      ctx.lineWidth = 0.5;
-      const gridSize = 50;
-      for (let gx = 0; gx < w + gridSize; gx += gridSize) {
-        for (let gy = 0; gy < h + gridSize; gy += gridSize) {
-          const offsetX = (Math.floor(gy / gridSize) % 2) * (gridSize / 2);
-          const px = gx + offsetX + Math.sin(t * 0.15 + gx * 0.01) * 2;
-          const py = gy + Math.cos(t * 0.12 + gy * 0.01) * 2;
-          ctx.beginPath();
-          for (let a = 0; a < 6; a++) {
-            const angle = (Math.PI / 3) * a - Math.PI / 6;
-            const hx = px + Math.cos(angle) * 14;
-            const hy = py + Math.sin(angle) * 14;
-            a === 0 ? ctx.moveTo(hx, hy) : ctx.lineTo(hx, hy);
-          }
-          ctx.closePath();
-          ctx.stroke();
-        }
-      }
-
-      // ── Scan beams ──
-      for (const beam of beams) {
-        beam.angle += beam.speed;
-        const cx = w / 2;
-        const cy = h / 2;
-        const ex = cx + Math.cos(beam.angle) * beam.length;
-        const ey = cy + Math.sin(beam.angle) * beam.length;
-        const grad = ctx.createLinearGradient(cx, cy, ex, ey);
-        grad.addColorStop(0, "transparent");
-        grad.addColorStop(0.3, hsl(PINK, beam.opacity));
-        grad.addColorStop(0.7, hsl(CYAN, beam.opacity * 0.5));
-        grad.addColorStop(1, "transparent");
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.lineTo(ex, ey);
-        ctx.strokeStyle = grad;
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-      }
-
-      // ── Update nodes ──
+      // ── Update nodes: organic wandering ──
       for (const n of nodes) {
         n.pulse += n.pulseSpeed;
-        n.activeCooldown -= 1;
 
-        // Gentle drift
-        n.targetX += Math.sin(t * 0.2 + n.pulse) * 0.08;
-        n.targetY += Math.cos(t * 0.18 + n.pulse * 1.3) * 0.08;
+        // Gentle sinusoidal drift around origin
+        const driftX = Math.sin(t * 0.3 + n.pulse * 2) * 40;
+        const driftY = Math.cos(t * 0.25 + n.pulse * 1.7) * 40;
+        const targetX = n.originX + driftX;
+        const targetY = n.originY + driftY;
 
-        // Wrap
-        if (n.targetX < -20) n.targetX = w + 20;
-        if (n.targetX > w + 20) n.targetX = -20;
-        if (n.targetY < -20) n.targetY = h + 20;
-        if (n.targetY > h + 20) n.targetY = -20;
+        // Spring back to drifting target
+        n.vx += (targetX - n.x) * 0.005;
+        n.vy += (targetY - n.y) * 0.005;
 
-        // Smooth follow
-        n.x += (n.targetX - n.x) * 0.03;
-        n.y += (n.targetY - n.y) * 0.03;
-
-        // Mouse interaction
-        const dx = mouse.x - n.x;
-        const dy = mouse.y - n.y;
+        // Mouse repulsion for organic feel
+        const dx = n.x - mouse.x;
+        const dy = n.y - mouse.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 200 && dist > 5) {
-          const push = (1 - dist / 200) * 2;
-          n.x -= (dx / dist) * push;
-          n.y -= (dy / dist) * push;
-          if (n.activeCooldown <= 0) {
-            n.active = true;
-            n.activeCooldown = 120;
-            n.ring = 0;
-          }
+        if (dist < 180 && dist > 1) {
+          const force = (1 - dist / 180) * 1.5;
+          n.vx += (dx / dist) * force;
+          n.vy += (dy / dist) * force;
         }
 
-        // Random activation
-        if (Math.random() < 0.0008 && n.activeCooldown <= 0) {
-          n.active = true;
-          n.activeCooldown = 200;
-          n.ring = 0;
-        }
+        n.vx *= 0.94;
+        n.vy *= 0.94;
+        n.x += n.vx;
+        n.y += n.vy;
+
+        // Soft wrap
+        if (n.x < -30) { n.x = w + 30; n.originX = w + 30; }
+        if (n.x > w + 30) { n.x = -30; n.originX = -30; }
+        if (n.y < -30) { n.y = h + 30; n.originY = h + 30; }
+        if (n.y > h + 30) { n.y = -30; n.originY = -30; }
       }
 
-      // ── Build connections & spawn packets ──
-      const connections: [number, number, number][] = [];
-      for (let i = 0; i < nodes.length && connections.length < MAX_CONN; i++) {
-        for (let j = i + 1; j < nodes.length && connections.length < MAX_CONN; j++) {
-          const dx = nodes[i].x - nodes[j].x;
-          const dy = nodes[i].y - nodes[j].y;
+      // ── Draw web connections (teia) ──
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const a = nodes[i];
+          const b = nodes[j];
+          const dx = a.x - b.x;
+          const dy = a.y - b.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < CONN_DIST) {
-            connections.push([i, j, dist]);
 
-            // Spawn data packets on active nodes
-            if ((nodes[i].active || nodes[j].active) && Math.random() < 0.03 && packets.length < 40) {
-              const colors = [PINK, CYAN, PURPLE, BLUE];
-              packets.push({
-                fromIdx: i,
-                toIdx: j,
-                progress: nodes[i].active ? 0 : 1,
-                speed: (0.008 + Math.random() * 0.015) * (nodes[i].active ? 1 : -1),
-                color: hsl(colors[Math.floor(Math.random() * colors.length)], 0.9),
-              });
+          if (dist < CONN_DIST) {
+            const strength = 1 - dist / CONN_DIST;
+            const wave = Math.sin(t * 1.2 + i * 0.5 + j * 0.3) * 0.5 + 0.5;
+            const alpha = strength * strength * (0.08 + wave * 0.07);
+
+            const color = COLORS[a.layer % 3];
+
+            // Draw curved web strand
+            const midX = (a.x + b.x) / 2 + Math.sin(t * 0.6 + i + j) * 12 * strength;
+            const midY = (a.y + b.y) / 2 + Math.cos(t * 0.5 + i - j) * 12 * strength;
+
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.quadraticCurveTo(midX, midY, b.x, b.y);
+            ctx.strokeStyle = `hsla(${color},${alpha})`;
+            ctx.lineWidth = strength * 1.5;
+            ctx.stroke();
+
+            // Signal pulse traveling along strong connections
+            if (strength > 0.45) {
+              const signalT = (t * 1.8 + i * 0.7) % 1;
+              const inv = 1 - signalT;
+              const sx = inv * inv * a.x + 2 * inv * signalT * midX + signalT * signalT * b.x;
+              const sy = inv * inv * a.y + 2 * inv * signalT * midY + signalT * signalT * b.y;
+
+              ctx.beginPath();
+              ctx.arc(sx, sy, 1.5 + strength, 0, Math.PI * 2);
+              ctx.fillStyle = `hsla(${COLORS[b.layer % 3]},${strength * 0.5})`;
+              ctx.fill();
             }
           }
         }
       }
 
-      // ── Draw connections ──
-      for (const [i, j, dist] of connections) {
-        const a = nodes[i];
-        const b = nodes[j];
-        const alpha = (1 - dist / CONN_DIST);
-        const isHub = a.type === "hub" || b.type === "hub";
+      // ── Draw nodes ──
+      for (const n of nodes) {
+        const p = Math.sin(n.pulse) * 0.5 + 0.5;
+        const r = n.radius * (0.7 + p * 0.6);
+        const alpha = 0.35 + p * 0.45;
+        const color = COLORS[n.layer % 3];
 
-        // Dashed lines for data nodes, solid for hubs
+        // Soft glow
         ctx.beginPath();
-        if (!isHub) {
-          ctx.setLineDash([4, 6]);
-        } else {
-          ctx.setLineDash([]);
-        }
-        ctx.moveTo(a.x, a.y);
-        ctx.lineTo(b.x, b.y);
-        ctx.strokeStyle = hsl(isHub ? PINK : CYAN, alpha * alpha * 0.12);
-        ctx.lineWidth = isHub ? alpha * 1.5 : alpha * 0.8;
-        ctx.stroke();
-        ctx.setLineDash([]);
-      }
+        ctx.arc(n.x, n.y, r * 4, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${color},${alpha * 0.05})`;
+        ctx.fill();
 
-      // ── Draw & update data packets ──
-      for (let p = packets.length - 1; p >= 0; p--) {
-        const pkt = packets[p];
-        pkt.progress += pkt.speed;
-        if (pkt.progress < 0 || pkt.progress > 1) {
-          packets.splice(p, 1);
-          continue;
-        }
-        const a = nodes[pkt.fromIdx];
-        const b = nodes[pkt.toIdx];
-        const px = a.x + (b.x - a.x) * pkt.progress;
-        const py = a.y + (b.y - a.y) * pkt.progress;
-
-        // Glow trail
+        // Mid ring
         ctx.beginPath();
-        ctx.arc(px, py, 4, 0, Math.PI * 2);
-        ctx.fillStyle = pkt.color.replace("0.9", "0.08");
+        ctx.arc(n.x, n.y, r * 2, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${color},${alpha * 0.1})`;
         ctx.fill();
 
         // Core
         ctx.beginPath();
-        ctx.arc(px, py, 1.8, 0, Math.PI * 2);
-        ctx.fillStyle = pkt.color;
+        ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${color},${alpha * 0.8})`;
         ctx.fill();
-      }
 
-      // ── Draw nodes ──
-      for (const n of nodes) {
-        const pulseVal = Math.sin(n.pulse) * 0.5 + 0.5;
-        const baseAlpha = n.type === "hub" ? 0.7 : n.type === "relay" ? 0.45 : 0.3;
-        const alpha = baseAlpha + pulseVal * 0.3;
-        const color = n.type === "hub" ? PINK : n.type === "relay" ? CYAN : BLUE;
-
-        // Active ring expansion
-        if (n.active) {
-          n.ring += 1.2;
-          const ringAlpha = Math.max(0, 0.3 - n.ring / 100);
-          if (ringAlpha <= 0) {
-            n.active = false;
-          } else {
-            ctx.beginPath();
-            ctx.arc(n.x, n.y, n.ring, 0, Math.PI * 2);
-            ctx.strokeStyle = hsl(color, ringAlpha);
-            ctx.lineWidth = 1.5;
-            ctx.stroke();
-          }
-        }
-
-        // Outer glow for hubs
-        if (n.type === "hub") {
-          ctx.beginPath();
-          ctx.arc(n.x, n.y, n.radius * 6, 0, Math.PI * 2);
-          ctx.fillStyle = hsl(PINK, 0.04 + pulseVal * 0.03);
-          ctx.fill();
-
-          // HUD crosshair
-          const cLen = 6 + pulseVal * 3;
-          ctx.strokeStyle = hsl(PINK, 0.2);
-          ctx.lineWidth = 0.5;
-          ctx.beginPath();
-          ctx.moveTo(n.x - cLen, n.y); ctx.lineTo(n.x - 3, n.y);
-          ctx.moveTo(n.x + 3, n.y); ctx.lineTo(n.x + cLen, n.y);
-          ctx.moveTo(n.x, n.y - cLen); ctx.lineTo(n.x, n.y - 3);
-          ctx.moveTo(n.x, n.y + 3); ctx.lineTo(n.x, n.y + cLen);
-          ctx.stroke();
-        }
-
-        // Core dot
+        // Bright center
         ctx.beginPath();
-        ctx.arc(n.x, n.y, n.radius * (0.8 + pulseVal * 0.4), 0, Math.PI * 2);
-        ctx.fillStyle = hsl(color, alpha);
+        ctx.arc(n.x, n.y, r * 0.35, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${color},${Math.min(alpha + 0.2, 1)})`;
         ctx.fill();
-
-        // Relay: small rotating square
-        if (n.type === "relay") {
-          ctx.save();
-          ctx.translate(n.x, n.y);
-          ctx.rotate(t * 0.5 + n.pulse);
-          const sz = 4 + pulseVal * 2;
-          ctx.strokeStyle = hsl(CYAN, 0.2);
-          ctx.lineWidth = 0.5;
-          ctx.strokeRect(-sz / 2, -sz / 2, sz, sz);
-          ctx.restore();
-        }
       }
 
-      // ── Mouse HUD reticle ──
+      // ── Mouse glow ──
       if (mouse.x > 0 && mouse.y > 0) {
-        const mx = mouse.x, my = mouse.y;
-        ctx.strokeStyle = hsl(PINK, 0.15);
-        ctx.lineWidth = 0.8;
-
-        // Rotating outer circle
-        ctx.save();
-        ctx.translate(mx, my);
-        ctx.rotate(t * 0.4);
-        ctx.beginPath();
-        ctx.arc(0, 0, 30, 0, Math.PI * 0.4);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.arc(0, 0, 30, Math.PI, Math.PI * 1.4);
-        ctx.stroke();
-        ctx.restore();
-
-        // Inner reticle
-        ctx.beginPath();
-        ctx.arc(mx, my, 8, 0, Math.PI * 2);
-        ctx.strokeStyle = hsl(CYAN, 0.12);
-        ctx.lineWidth = 0.5;
-        ctx.stroke();
-
-        // Ambient glow
-        const grad = ctx.createRadialGradient(mx, my, 0, mx, my, 150);
-        grad.addColorStop(0, hsl(PINK, 0.06));
-        grad.addColorStop(0.5, hsl(PURPLE, 0.02));
+        const grad = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 160);
+        grad.addColorStop(0, `hsla(${PINK},0.07)`);
+        grad.addColorStop(0.5, `hsla(${PURPLE},0.03)`);
         grad.addColorStop(1, "transparent");
         ctx.fillStyle = grad;
-        ctx.fillRect(mx - 150, my - 150, 300, 300);
+        ctx.fillRect(mouse.x - 160, mouse.y - 160, 320, 320);
       }
 
       animRef.current = requestAnimationFrame(draw);
@@ -402,7 +225,7 @@ export default function NeuralNetworkBg() {
     <canvas
       ref={canvasRef}
       className="fixed inset-0 z-0 pointer-events-none"
-      style={{ background: "linear-gradient(180deg, hsl(240,15%,4%) 0%, hsl(235,20%,6%) 50%, hsl(240,15%,4%) 100%)" }}
+      style={{ background: "linear-gradient(180deg, hsl(240,15%,4%) 0%, hsl(235,18%,6%) 50%, hsl(240,15%,4%) 100%)" }}
     />
   );
 }
