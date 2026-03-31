@@ -29,7 +29,7 @@ const apps = [
     Icon: Handshake,
     gradient: "from-rose-500 to-pink-700",
     glowColor: "hsl(340, 82%, 52%)",
-    url: "https://liderancas.deputadasarelli.com.br/login",
+    url: "https://liderancas.deputadasarelli.com.br/",
     xp: 850,
   },
   {
