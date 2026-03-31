@@ -89,6 +89,17 @@ const apps = [
     xp: 920,
   },
   {
+    id: "sindspag",
+    title: "SINDSPAG",
+    desc: "Gestão sindical e associados",
+    badge: "Sindicato",
+    Icon: Building2,
+    gradient: "from-amber-500 to-orange-700",
+    glowColor: "hsl(30, 80%, 50%)",
+    url: "https://sindspag.deputadasarelli.com.br/",
+    xp: 760,
+  },
+  {
     id: "site",
     title: "Site Oficial",
     desc: "Portal institucional da campanha",
