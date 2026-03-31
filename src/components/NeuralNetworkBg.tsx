@@ -83,7 +83,7 @@ export default function NeuralNetworkBg() {
       const nodes = nodesRef.current;
       const mouse = mouseRef.current;
       const t = timeRef.current;
-      timeRef.current += 0.006; // Very slow time progression
+      timeRef.current += 0.003; // Ultra slow
 
       ctx.clearRect(0, 0, w, h);
 
