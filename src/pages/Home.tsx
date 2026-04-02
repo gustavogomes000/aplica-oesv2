@@ -23,14 +23,14 @@ const PHOTO_URL =
 /* ─── dados dos apps ─────────────────────────────────────────────── */
 const apps = [
   {
-    id: "liderancas",
-    title: "Lideranças",
+    id: "rede",
+    title: "Rede",
     desc: "Cadastro de lideranças da campanha",
     badge: "Articulação",
     Icon: Handshake,
     gradient: "from-rose-500 to-pink-700",
     glowColor: "hsl(340, 82%, 52%)",
-    url: "https://liderancas.deputadasarelli.com.br/",
+    url: "https://rede.deputadasarelli.com.br/",
     xp: 850,
   },
   {
