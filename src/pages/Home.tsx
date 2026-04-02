@@ -34,8 +34,8 @@ const apps = [
     xp: 850,
   },
   {
-    id: "financeiro",
-    title: "Financeiro",
+    id: "contas-pagar",
+    title: "Contas a Pagar",
     desc: "Lançamento de contas do escritório",
     badge: "Finanças",
     Icon: ReceiptText,
