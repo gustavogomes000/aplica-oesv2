@@ -16,6 +16,7 @@ import {
   Globe,
   ArrowUpRight,
   Building2,
+  BrainCircuit,
   LogOut,
   Loader2,
 } from "lucide-react";
@@ -93,6 +94,16 @@ const apps = [
     gradient: "from-amber-400 to-orange-600",
     iconBg: "bg-gradient-to-br from-amber-400 to-orange-600",
     url: "https://sindspag.deputadasarelli.com.br/",
+  },
+  {
+    id: "ia-eleicoes",
+    title: "IA Eleições",
+    desc: "Inteligência artificial eleitoral",
+    badge: "IA",
+    Icon: BrainCircuit,
+    gradient: "from-emerald-400 to-teal-600",
+    iconBg: "bg-gradient-to-br from-emerald-400 to-teal-600",
+    url: "https://iaeleicoes.deputadasarelli.com.br/",
   },
   {
     id: "site",
