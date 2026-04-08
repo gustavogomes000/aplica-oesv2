@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ExternalLink, RefreshCw } from "lucide-react";
-import { useState, type LucideIcon } from "react";
+import { useState } from "react";
+import type { LucideIcon } from "lucide-react";
 
 interface Props {
   url: string;
