@@ -370,23 +370,6 @@ export default function Home() {
           </div>
         </main>
 
-        {/* ── FOOTER ── */}
-        <footer className="max-w-2xl w-full mx-auto px-5 sm:px-6 pb-6 pt-2">
-          <div className="h-px mb-4 bg-gradient-to-r from-transparent via-border to-transparent" />
-          <div className="flex flex-col items-center gap-1 text-center">
-            <p className="text-xs text-muted-foreground font-medium">
-              Pré-candidata a Deputada Estadual — GO 2026
-            </p>
-            <a
-              href="https://www.deputadasarelli.com.br"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs text-primary hover:text-primary/80 transition-colors font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
-            >
-              drafernandasarelli.com.br
-            </a>
-          </div>
-        </footer>
       </div>
     </div>
   );
