@@ -5,6 +5,7 @@ import SplashScreen from "@/components/SplashScreen";
 import PullToRefresh from "@/components/PullToRefresh";
 import AppWebView from "@/components/AppWebView";
 import { useAuth } from "@/contexts/AuthContext";
+import logoSarelli from "@/assets/Logo_Sarelli.png";
 import { toast } from "@/hooks/use-toast";
 import {
   Handshake,
@@ -464,60 +465,41 @@ export default function Home() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6 }}
             >
-              <div className="max-w-2xl mx-auto px-5 sm:px-6 pt-6 pb-2 sm:pt-10 sm:pb-4">
-                <div className="flex items-center gap-4">
-                  {/* Photo */}
+              <div className="max-w-2xl mx-auto px-5 sm:px-6 pt-5 pb-1 sm:pt-8 sm:pb-3">
+                <motion.div
+                  className="flex flex-col items-center"
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.1 }}
+                >
+                  <img
+                    src={logoSarelli}
+                    alt="Dra. Fernanda Sarelli"
+                    className="w-48 sm:w-64 h-auto object-contain"
+                    loading="eager"
+                    fetchPriority="high"
+                  />
                   <motion.div
-                    className="relative shrink-0"
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 0.5, delay: 0.1 }}
+                    className="flex items-center gap-3 mt-2"
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
                   >
-                    <div className="relative w-16 h-16 sm:w-20 sm:h-20">
-                      <motion.div
-                        className="absolute inset-0 rounded-full"
-                        style={{
-                          background:
-                            "conic-gradient(from 0deg, hsl(340,82%,55%), hsl(350,70%,70%), hsl(330,60%,65%), hsl(340,82%,55%))",
-                          padding: "2px",
-                        }}
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-                      >
-                        <div className="w-full h-full rounded-full bg-background" />
-                      </motion.div>
-                      <div className="absolute inset-[4px] rounded-full overflow-hidden shadow-lg">
-                        <img
-                          src={PHOTO_URL}
-                          alt="Dra. Fernanda Sarelli"
-                          className="w-full h-full object-cover"
-                          width={80}
-                          height={80}
-                          loading="eager"
-                          fetchPriority="high"
-                        />
-                      </div>
-                    </div>
-                  </motion.div>
-
-                  {/* Text */}
-                  <motion.div
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.2, duration: 0.4 }}
-                    className="flex-1 min-w-0"
-                  >
-                    <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.25em] text-primary/60 mb-0.5">
-                      {getGreeting()}
-                    </p>
-                    <h1 className="text-xl sm:text-2xl font-black tracking-tight text-foreground leading-none">
+                    <div className="h-px w-8 bg-gradient-to-r from-transparent to-primary/30" />
+                    <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-primary/50">
                       Central de Operações
-                    </h1>
-                    <p className="text-[11px] sm:text-xs text-muted-foreground capitalize mt-1">
-                      {dateStr}
                     </p>
+                    <div className="h-px w-8 bg-gradient-to-l from-transparent to-primary/30" />
                   </motion.div>
-                </div>
+                  <motion.p
+                    className="text-[10px] text-muted-foreground capitalize mt-1"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.4 }}
+                  >
+                    {getGreeting()} — {dateStr}
+                  </motion.p>
+                </motion.div>
               </div>
             </motion.header>
 
