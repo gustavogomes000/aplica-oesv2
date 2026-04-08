@@ -223,6 +223,48 @@ export default function Home() {
       <NeuralNetworkBg />
 
       <div className="relative z-10 flex flex-col min-h-[100dvh]">
+        {/* ── AUTH BAR ── */}
+        <AnimatePresence>
+          {(autoLogging || user) && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="w-full bg-card/80 backdrop-blur-xl border-b border-border/50"
+            >
+              <div className="max-w-2xl mx-auto px-5 sm:px-6 py-2.5 flex items-center justify-between">
+                {autoLogging ? (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Loader2 size={14} className="animate-spin" />
+                    <span>Entrando automaticamente...</span>
+                  </div>
+                ) : user && usuario ? (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                        <span className="text-[11px] font-bold text-primary-foreground">
+                          {usuario.nome.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold text-foreground leading-tight">{usuario.nome}</p>
+                        <p className="text-[10px] text-muted-foreground capitalize">{usuario.tipo}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleSignOut}
+                      className="flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-destructive transition-colors px-2.5 py-1.5 rounded-lg hover:bg-destructive/10"
+                    >
+                      <LogOut size={13} />
+                      Sair
+                    </button>
+                  </>
+                ) : null}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* ── HERO ── */}
         <motion.header
           className="w-full"
