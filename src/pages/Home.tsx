@@ -5,7 +5,7 @@ import SplashScreen from "@/components/SplashScreen";
 import PullToRefresh from "@/components/PullToRefresh";
 import AppWebView from "@/components/AppWebView";
 import { useAuth } from "@/contexts/AuthContext";
-import logoSarelli from "@/assets/Logo_Sarelli.png";
+import logoSarelli from "@/assets/Logo_Sarelli_opt.png";
 import { toast } from "@/hooks/use-toast";
 import {
   Handshake,
